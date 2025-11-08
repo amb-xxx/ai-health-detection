@@ -1,0 +1,1410 @@
+
+</script>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Symptom Checker — Multi-step AI Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  #loginSection div:hover {
+  box-shadow:0 0 25px rgba(0,255,255,0.25);
+  transition:0.3s;
+}
+
+  :root{
+    --bg1:#0d0322;
+    --accent1:#00e0ff;
+    --accent2:#ff4fb1;
+    --card:#ffffff;
+    --muted:#9ca3af;
+    --danger:#ff6b6b;
+    --success:#2dd4bf;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+   body {
+    margin: 0;
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    background: var(--bg1);
+    color: var(--card);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background:linear-gradient(270deg,#0d1220,#002244,#33001a);
+    background-size:600% 600%;
+    animation:bgMove 18s ease infinite;
+    z-index:-3;opacity:0.92;
+  }
+  @keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  #tsparticles{position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:0.6}
+
+  .site{max-width:1100px;margin:28px auto;padding:20px;position:relative;z-index:2}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{
+    width:52px;height:52px;border-radius:12px;
+    background:linear-gradient(45deg,var(--accent1),var(--accent2));
+    display:flex;align-items:center;justify-content:center;color:#041124;font-weight:800;font-size:22px;
+    transition:transform .18s ease,box-shadow .18s ease;
+  }
+  .logo:hover{transform:scale(1.06);box-shadow:0 8px 30px rgba(0,224,255,0.12)}
+  .title{font-weight:800;color:#eef7ff;font-size:18px;letter-spacing:.4px}
+  nav a{color:rgba(238,247,255,0.9);text-decoration:none;margin-left:16px;font-weight:600;cursor:pointer}
+
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border-radius:14px;padding:20px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 20px 60px rgba(3,9,20,0.45);margin-bottom:20px}
+  .progress-wrap{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .progress{flex:1;height:10px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden}
+  .progress>.bar{height:100%;background:linear-gradient(90deg,var(--accent1),var(--accent2));width:0;transition:width .35s}
+  .progress-info{font-weight:700;color:rgba(238,247,255,0.9);font-size:13px;min-width:88px;text-align:right}
+
+  h1{color:#f3f7ff;margin:6px 0 10px;font-size:22px}
+  p.lead{color:rgba(235,245,255,0.82);margin:0 0 12px;font-size:14px}
+
+  .step{display:none}
+  .step.active{display:block;animation:fade .22s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .options{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  .option{background:rgba(255,255,255,0.06);padding:12px;border-radius:10px;display:flex;align-items:center;gap:12px;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+  .option[aria-pressed="true"]{outline:2px solid rgba(0,224,255,0.12);box-shadow:0 6px 18px rgba(0,224,255,0.05)}
+  .option input{transform:scale(1.05);accent-color:var(--accent1)}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  input[type="number"], input[type="text"], select{padding:12px;border-radius:8px;border:none;background:rgba(255,255,255,0.95);color:#041124;font-weight:700;min-width:120px}
+  input[type="text"].error, input[type="number"].error{box-shadow:0 0 0 3px rgba(255,107,107,0.08);border-radius:8px}
+  .chip-input{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-radius:10px;background:rgba(255,255,255,0.96);color:#041124}
+  .chip{background:linear-gradient(90deg,#eef9ff,#fff0f8);color:#042;padding:8px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:8px}
+  .chip button{background:transparent;border:none;cursor:pointer;color:#044;font-weight:700}
+
+  .small-muted{color:var(--muted);font-size:13px}
+  .actions{display:flex;gap:10px;justify-content:space-between;margin-top:14px;flex-wrap:wrap}
+  .btn{padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:700;min-width:120px}
+  .btn.primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041124}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#e9f3ff}
+  .btn:focus{outline:3px solid rgba(0,224,255,0.12)}
+  .btn.small{min-width:96px;padding:8px 12px;font-size:13px}
+
+  .results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:16px}
+  .result-card{background:#fff;color:#042;padding:12px;border-radius:10px;box-shadow:0 10px 30px rgba(2,8,20,0.08)}
+  .result-score{font-weight:800;color:#0b66ff;font-size:20px}
+  .confidence-high{color:var(--success);font-weight:800}
+  .confidence-mid{color:#f59e0b;font-weight:800}
+  .confidence-low{color:var(--danger);font-weight:800}
+
+  footer.small{margin-top:18px;color:rgba(235,245,255,0.8);font-size:13px;text-align:center}
+
+  /* contact */
+  #contactSection{background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));padding:20px;border-radius:14px;margin-top:40px}
+  #contactSection ul li{margin-bottom:6px;color:#fff}
+  #contactSection strong{color:var(--accent1)}
+  #contactSection a{color:var(--accent1);text-decoration:none}
+
+  /* review table */
+  .review-list{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+  .review-row{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.02)}
+
+  /* small screens */
+  @media(max-width:820px){ h1{font-size:20px} .logo{width:44px;height:44px;font-size:18px} input[type="text"],input[type="number"]{font-size:16px} .progress-info{min-width:64px;font-size:12px} }
+  @media(max-width:480px){ .review-list{grid-template-columns:1fr} .actions{flex-direction:column-reverse} }
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+</head>
+<body>
+  <div id="tsparticles"></div>
+<!-- Login Page Section -->
+<!-- Login Page Section -->
+<!-- LOGIN SECTION -->
+<div id="loginSection" 
+     style="display:flex;justify-content:center;align-items:center;min-height:100vh;
+            background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);">
+  <div style="background:rgba(255,255,255,0.08);padding:40px 50px;border-radius:16px;
+              width:360px;text-align:center;backdrop-filter:blur(12px);
+              box-shadow:0 8px 25px rgba(0,0,0,0.3);display:flex;
+              flex-direction:column;align-items:center;gap:15px;">
+              
+    <h2 style="color:white;margin-bottom:5px;">Welcome Back 👋</h2>
+
+    <form id="loginForm" onsubmit="handleLogin(event)" 
+          style="width:100%;display:flex;flex-direction:column;gap:15px;">
+      <input type="text" id="username" placeholder="Username"
+             style="width:100%;padding:12px;border:none;border-radius:8px;
+                    background:rgba(255,255,255,0.1);color:white;outline:none;
+                    font-size:15px;text-align:left;">
+      <input type="password" id="password" placeholder="Password"
+             style="width:100%;padding:12px;border:none;border-radius:8px;
+                    background:rgba(255,255,255,0.1);color:white;outline:none;
+                    font-size:15px;text-align:left;">
+
+      <button type="submit"
+              style="width:100%;padding:12px;border:none;border-radius:8px;
+                     background:#00dfd8;color:white;font-weight:bold;
+                     cursor:pointer;font-size:15px;margin-top:10px;">
+        Sign In
+      </button>
+    </form>
+
+    <div style="width:100%;display:flex;align-items:center;gap:10px;margin:15px 0;">
+      <div style="flex:1;height:1px;background:rgba(255,255,255,0.2);"></div>
+      <span style="color:rgba(255,255,255,0.6);font-size:14px;">or</span>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,0.2);"></div>
+    </div>
+
+    <div id="g_id_onload"
+     data-client_id="847679053196-tffnk79u36ggt8bghkgq8vhjkrn9fu0q.apps.googleusercontent.com"
+     data-callback="handleCredentialResponse">
+</div>
+<div class="g_id_signin"
+     data-type="standard"
+     data-size="large"
+     data-width="100%"
+     data-theme="outline"
+     data-text="signup_with"
+     data-shape="rectangular"
+     data-logo_alignment="left"
+     style="
+       width:100%;
+       max-width:360px;
+       display:flex;
+       justify-content:center;
+       margin:auto;
+     ">
+</div>
+
+
+<p style="margin-top:10px;color:rgba(255,255,255,0.8);font-size:14px;">
+  Don’t have an account?
+  <a href="#" style="color:#00dfd8;text-decoration:none;font-weight:500;">Sign up</a>
+</p>
+  </div>
+</div>
+
+
+<!-- DASHBOARD SECTION (hidden until login) -->
+
+</div>
+
+
+
+   
+</div>
+
+<!-- End of Login Page Section -->
+
+<!-- End of Login Section -->
+
+  <div class="site" role="main" aria-labelledby="main-title" style="display:none;">
+
+    <header>
+      <div class="brand">
+       <div class="logo-box" onclick="scrollToId('home')" role="button" aria-label="Home">
+  <img src="logo.png.png" alt="" style="height:60px;width:auto;vertical-align:middle;">
+</div>
+
+        <div class="title">HEALTH DETECTION</div>
+      </div>
+      <nav aria-label="Main navigation">
+        <a onclick="goHome()" role="button">Home</a>
+        <a onclick="goContact()" role="button">Contact</a>
+      </nav>
+      <button onclick="logout()" 
+  style="background:#ff5252;
+         color:white;
+         border:none;
+         padding:8px 14px;
+         border-radius:6px;
+         cursor:pointer;
+         font-weight:600;
+         margin-left:10px;">
+  Logout
+</button>
+
+    </header>
+
+    <div id="mainCard" class="card" aria-live="polite">
+      <div class="progress-wrap">
+        <div class="progress" aria-hidden="true"><div class="bar" id="progressBar" style="width:0%"></div></div>
+        <div class="progress-info" id="progressInfo">Step 1 / 19 — 0%</div>
+      </div>
+
+      <h1 id="main-title">We will ask a few simple questions — take ~3–5 minutes</h1>
+      <p class="lead">This is an informational tool. It suggests likely conditions based on answers — not a diagnosis.</p>
+
+      <!-- Steps -->
+      <div id="step1" class="step active" data-step="1" aria-labelledby="q1">
+        <h3 id="q1">1 / 19 — Sex at birth</h3>
+        <div class="options" role="radiogroup" aria-label="Sex at birth">
+          <label class="option" role="radio" tabindex="0"><input type="radio" name="sex" value="Male" aria-label="Male"> Male</label>
+          <label class="option" role="radio" tabindex="0"><input type="radio" name="sex" value="Female" aria-label="Female"> Female</label>
+          <label class="option" role="radio" tabindex="0"><input type="radio" name="sex" value="Other" aria-label="Other"> Other / Prefer not to say</label>
+        </div>
+        <div class="small-muted" id="err-step1" style="display:none;color:var(--danger);margin-top:8px"></div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()" aria-label="Back">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()" aria-label="Next">Next</button></div>
+      </div>
+
+      <div id="step2" class="step" data-step="2">
+        <h3>2 / 19 — Gender identity</h3>
+        <div class="options" role="radiogroup" aria-label="Gender identity">
+          <label class="option"><input type="radio" name="gender" value="Cisgender"> Cisgender</label>
+          <label class="option"><input type="radio" name="gender" value="Transgender"> Transgender</label>
+          <label class="option"><input type="radio" name="gender" value="Non-binary"> Non-binary</label>
+          <label class="option"><input type="radio" name="gender" value="Prefer not to say"> Prefer not to say</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step3" class="step" data-step="3">
+        <h3>3 / 19 — Age</h3>
+        <div class="row" style="margin-top:10px">
+          <input id="ageInput" type="number" min="0" max="120" value="30" aria-label="Age in years"/>
+          <div class="small-muted">years</div>
+        </div>
+        <div id="err-step3" class="small-muted" style="display:none;color:var(--danger);margin-top:8px"></div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step4" class="step" data-step="4">
+        <h3>4 / 19 — Ethnicity (select any)</h3>
+        <div class="options" id="ethnicityOptions">
+          <label class="option"><input type="checkbox" value="African American/Black"> African American/Black</label>
+          <label class="option"><input type="checkbox" value="Asian"> Asian</label>
+          <label class="option"><input type="checkbox" value="Caucasian/White"> Caucasian/White</label>
+          <label class="option"><input type="checkbox" value="Hispanic/Latino"> Hispanic/Latino</label>
+          <label class="option"><input type="checkbox" value="Middle Eastern/North African"> Middle Eastern/North African</label>
+          <label class="option"><input type="checkbox" value="Native/Indigenous"> Native/Indigenous</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step5" class="step" data-step="5">
+        <h3>5 / 19 — Height & weight (we'll estimate BMI)</h3>
+        <div class="row" style="margin-top:10px">
+          <input id="heightInput" type="number" min="50" max="250" placeholder="Height cm" aria-label="Height in centimeters"/>
+          <input id="weightInput" type="number" min="20" max="300" placeholder="Weight kg" aria-label="Weight in kilograms"/>
+        </div>
+        <div id="err-step5" class="small-muted" style="display:none;color:var(--danger);margin-top:8px"></div>
+        <div class="small-muted" style="margin-top:8px">Optional but helpful for risk assessment.</div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step6" class="step" data-step="6">
+        <h3>6 / 19 — Family history (select any)</h3>
+        <div class="options">
+          <label class="option"><input type="checkbox" value="Heart disease"> Heart disease</label>
+          <label class="option"><input type="checkbox" value="Diabetes"> Diabetes</label>
+          <label class="option"><input type="checkbox" value="Cancer"> Cancer</label>
+          <label class="option"><input type="checkbox" value="Stroke"> Stroke</label>
+          <label class="option"><input type="checkbox" value="None/Unknown"> None / Unknown</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step7" class="step" data-step="7">
+        <h3>7 / 19 — Alcohol use</h3>
+        <div class="options">
+          <label class="option"><input type="radio" name="alcohol" value="Never"> Never</label>
+          <label class="option"><input type="radio" name="alcohol" value="Occasionally"> Occasionally</label>
+          <label class="option"><input type="radio" name="alcohol" value="Weekly"> Weekly</label>
+          <label class="option"><input type="radio" name="alcohol" value="Daily"> Daily</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step8" class="step" data-step="8">
+        <h3>8 / 19 — Smoking</h3>
+        <div class="options">
+          <label class="option"><input type="radio" name="smoke" value="Never"> Never</label>
+          <label class="option"><input type="radio" name="smoke" value="Former"> Former</label>
+          <label class="option"><input type="radio" name="smoke" value="Current"> Current</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step9" class="step" data-step="9">
+        <h3>9 / 19 — Physical activity level</h3>
+        <div class="options">
+          <label class="option"><input type="radio" name="activity" value="Sedentary"> Sedentary</label>
+          <label class="option"><input type="radio" name="activity" value="Light"> Light (1–2 times/wk)</label>
+          <label class="option"><input type="radio" name="activity" value="Moderate"> Moderate (3–5 times/wk)</label>
+          <label class="option"><input type="radio" name="activity" value="Active"> Active (daily)</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step10" class="step" data-step="10">
+        <h3>10 / 19 — Diet</h3>
+        <div class="options">
+          <label class="option"><input type="radio" name="diet" value="Omnivore"> Omnivore</label>
+          <label class="option"><input type="radio" name="diet" value="Vegetarian"> Vegetarian</label>
+          <label class="option"><input type="radio" name="diet" value="Vegan"> Vegan</label>
+          <label class="option"><input type="radio" name="diet" value="High processed"> High processed foods</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step11" class="step" data-step="11">
+        <h3>11 / 19 — Sleep</h3>
+        <div class="options">
+          <label class="option"><input type="radio" name="sleep" value="<5"> &lt;5 hrs/night</label>
+          <label class="option"><input type="radio" name="sleep" value="5-7"> 5–7 hrs/night</label>
+          <label class="option"><input type="radio" name="sleep" value="7-9"> 7–9 hrs/night</label>
+          <label class="option"><input type="radio" name="sleep" value=">9"> &gt;9 hrs/night</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step12" class="step" data-step="12">
+        <h3>12 / 19 — Mental health (select any)</h3>
+        <div class="options">
+          <label class="option"><input type="checkbox" value="Stress"> Stress</label>
+          <label class="option"><input type="checkbox" value="Anxiety"> Anxiety</label>
+          <label class="option"><input type="checkbox" value="Depression"> Depression</label>
+          <label class="option"><input type="checkbox" value="None"> None</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step13" class="step" data-step="13">
+        <h3>13 / 19 — Recent travel or infection exposure?</h3>
+        <div class="options">
+          <label class="option"><input type="radio" name="travel" value="No"> No</label>
+          <label class="option"><input type="radio" name="travel" value="Yes"> Yes — recent travel or known exposure</label>
+        </div>
+        <div style="margin-top:8px"><input id="travelDetail" type="text" placeholder="If yes, type country or exposure details (optional)" aria-label="Travel or exposure details" /></div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step14" class="step" data-step="14">
+        <h3>14 / 19 — Vaccinations (select any)</h3>
+        <div class="options">
+          <label class="option"><input type="checkbox" value="Flu vaccine"> Flu vaccine</label>
+          <label class="option"><input type="checkbox" value="COVID vaccination"> COVID vaccination</label>
+          <label class="option"><input type="checkbox" value="None"> None</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step15" class="step" data-step="15">
+        <h3>15 / 19 — Current medications (type and press Enter)</h3>
+        <div style="margin-top:8px"><input id="medInput" type="text" placeholder="e.g., Metformin, Lisinopril" aria-label="Type medication and press Enter" /></div>
+        <div style="margin-top:8px"><div id="medChips" class="chip-input" aria-live="polite"></div></div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step16" class="step" data-step="16">
+        <h3>16 / 19 — Enter your symptoms (comma-separated)</h3>
+        <div style="margin-top:8px"><input id="symptomInput" type="text" placeholder="e.g., fever, cough, chest pain" aria-label="Type symptoms and press Enter or comma" /></div>
+        <div style="margin-top:8px"><div id="symptomChips" class="chip-input" aria-live="polite"></div></div>
+        <div class="small-muted" style="margin-top:8px">Tip: add as many symptoms as apply — press Enter or comma to add.</div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Next</button></div>
+      </div>
+
+      <div id="step17" class="step" data-step="17">
+        <h3>17 / 19 — Risk factors (select any)</h3>
+        <div class="options">
+          <label class="option"><input type="checkbox" value="Smoking"> Smoking</label>
+          <label class="option"><input type="checkbox" value="High blood pressure"> High blood pressure</label>
+          <label class="option"><input type="checkbox" value="High cholesterol"> High cholesterol</label>
+          <label class="option"><input type="checkbox" value="Obesity"> Obesity</label>
+          <label class="option"><input type="checkbox" value="Immunosuppression"> Immunosuppression</label>
+          <label class="option"><input type="checkbox" value="Pregnancy"> Pregnancy</label>
+        </div>
+        <div class="actions"><button class="btn ghost small" onclick="prev()">Back</button><div style="flex:1"></div><button class="btn primary" onclick="next()">Review answers</button></div>
+      </div>
+
+      <!-- Review step -->
+      <div id="step18" class="step" data-step="18">
+        <h3>18 / 19 — Review your answers</h3>
+        <div id="reviewContainer" style="margin-top:12px"></div>
+        <div class="small-muted" style="margin-top:8px">Tap any Edit button to jump back and change an answer.</div>
+        <div class="actions">
+          <button class="btn ghost small" onclick="prev()">Back</button>
+          <div style="flex:1"></div>
+          <button class="btn primary" onclick="finish()" id="finishBtn">Get Results</button>
+        </div>
+      </div>
+
+      <!-- Results step -->
+      <div id="results" class="step" data-step="19" aria-live="polite">
+        <h3>Results</h3>
+        <div id="resultsGrid" class="results-grid" style="margin-top:8px"></div>
+
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+          <button class="btn ghost small" onclick="restart()">Start Over</button>
+          <button class="btn ghost small" onclick="downloadReport()">Download JSON</button>
+          <button class="btn primary small" onclick="printReport()">Print</button>
+          <div style="flex:1"></div>
+        </div>
+      </div>
+
+      <div id="saveNotice" style="margin-top:12px;color:var(--muted);font-size:13px"></div>
+    </div>
+
+    <div id="contactSection" class="card">
+      <h2>Contact Us</h2>
+      <p>Get in touch with us using the details below:</p>
+      <ul style="list-style:none;padding:0;line-height:1.8;font-size:16px;">
+        <li><strong>Phone:</strong> +1 234 567 890</li>
+        <li><strong>Email:</strong> support@healthchecker.com</li>
+        <li><strong>Discord:</strong> <a href="https://discord.gg/your-server" target="_blank" rel="noopener">Join our Discord</a></li>
+        <li><strong>Website:</strong> <a href="https://www.healthchecker.com" target="_blank" rel="noopener">www.healthchecker.com</a></li>
+      </ul>
+    </div>
+
+    <footer class="small">This tool is for informational purposes only. It is NOT a medical diagnosis.</footer>
+  </div>
+
+<!-- tsparticles CDN (single load) -->
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js"></script>
+
+<script>
+  
+</script>
+
+
+<script>
+  
+/* =========================
+   PARTICLES INIT (lighter)
+   ========================= */
+tsParticles.load("tsparticles", {
+  particles: {
+    number:{value:36},
+    color:{value:["#00e0ff","#ff4fb1","#ffffff"]},
+    links:{enable:true,opacity:0.10},
+    move:{enable:true,speed:0.9},
+    size:{value:2.0}
+  },
+  interactivity:{ events:{onHover:{enable:true,mode:'repulse'},onClick:{enable:true,mode:'push'} }, modes:{repulse:{distance:90},push:{quantity:2}} }
+});
+
+/* =========================
+   APP LOGIC
+   ========================= */
+
+const STORAGE_KEY = 'symptom-checker-v1';
+const totalSteps = 19; // 18 including review + results step is 19
+let currentStep = 1;
+const progressBar = document.getElementById('progressBar');
+const progressInfo = document.getElementById('progressInfo');
+let meds = [], symptoms = [];
+
+const DISEASES = [
+  {
+    Disease: "Cardiovascular Disease",
+    Subtypes: "Heart disease, Stroke",
+    "Risk Factors": "high blood pressure, high cholesterol, smoking, obesity, sedentary lifestyle, poor diet",
+    Symptoms: "chest pain, shortness of breath, fatigue, sudden weakness, numbness, trouble speaking",
+    Prevention: "healthy diet, regular exercise, no smoking, control blood pressure & cholesterol, maintain weight"
+  },
+  {
+    Disease: "Cancer (general)",
+    Subtypes: "Breast, Lung, Prostate, Colon, Skin, Cervical",
+    "Risk Factors": "tobacco, alcohol, radiation, poor diet, genetics, infections (HPV, H. pylori, Hepatitis)",
+    Symptoms: "unexplained weight loss, lumps, persistent cough, changes in skin, fatigue, bleeding",
+    Prevention: "avoid tobacco & alcohol, vaccinations, healthy diet, regular screening, sun protection"
+  },
+  {
+    Disease: "Diabetes Mellitus",
+    Subtypes: "Type 1, Type 2, Gestational",
+    "Risk Factors": "obesity, family history, sedentary lifestyle, poor diet, high sugar intake",
+    Symptoms: "increased thirst, frequent urination, fatigue, blurred vision, slow healing",
+    Prevention: "healthy eating, regular exercise, maintain healthy weight, regular screenings"
+  },
+  {
+    Disease: "Asthma",
+    Subtypes: null,
+    "Risk Factors": "allergens, air pollution, smoking, family history",
+    Symptoms: "wheezing, coughing, shortness of breath, chest tightness",
+    Prevention: "avoid triggers, clean air, regular use of inhaler, vaccinations"
+  },
+  {
+    Disease: "Chronic Obstructive Pulmonary Disease (COPD)",
+    Subtypes: "Chronic bronchitis, Emphysema",
+    "Risk Factors": "smoking, long-term exposure to pollutants, occupational hazards, age",
+    Symptoms: "chronic cough, mucus, wheezing, breathlessness, chest tightness",
+    Prevention: "no smoking, reduce exposure to pollutants, vaccinations, regular checkups"
+  },
+  {
+    Disease: "Pneumonia",
+    Subtypes: "Bacterial, Viral, Fungal",
+    "Risk Factors": "weakened immunity, chronic lung disease, age (young/old), smoking",
+    Symptoms: "fever, cough with sputum, chest pain, difficulty breathing",
+    Prevention: "vaccination, good hygiene, avoid smoke, maintain healthy lungs"
+  },
+  {
+    Disease: "Influenza",
+    Subtypes: "Type A, Type B",
+    "Risk Factors": "close contact, low immunity, age extremes, chronic illnesses",
+    Symptoms: "fever, cough, body aches, fatigue, sore throat",
+    Prevention: "annual vaccination, hygiene, avoid sick people, rest & fluids"
+  },
+  {
+    Disease: "COVID-19",
+    Subtypes: "SARS-CoV-2 variants",
+    "Risk Factors": "close contact, travel, comorbidities, weak immune system",
+    Symptoms: "fever, cough, shortness of breath, loss of taste or smell, fatigue",
+    Prevention: "vaccination, masks, hand hygiene, isolation of infected"
+  },
+  {
+    Disease: "Tuberculosis",
+    Subtypes: "Pulmonary, Extrapulmonary",
+    "Risk Factors": "crowding, HIV, malnutrition, weak immunity",
+    Symptoms: "persistent cough (>2-3 weeks), night sweats, weight loss, fever",
+    Prevention: "BCG vaccine, early detection, full course treatment, improve living conditions"
+  },
+  {
+    Disease: "Malaria",
+    Subtypes: "Plasmodium falciparum, vivax, etc.",
+    "Risk Factors": "mosquito bites, living/traveling in endemic areas, lack of bed nets",
+    Symptoms: "fever, chills, sweating, headache, nausea",
+    Prevention: "mosquito nets, insect repellents, anti-malarial medication, reduce mosquito breeding"
+  },
+  {
+    Disease: "HIV/AIDS",
+    Subtypes: null,
+    "Risk Factors": "unprotected sex, sharing needles, mother-to-child transmission",
+    Symptoms: "recurrent infections, weight loss, fever, fatigue, swollen lymph nodes",
+    Prevention: "safe sex, use of condoms, clean needles, HIV testing, antiretroviral therapy"
+  },
+  {
+    Disease: "Hepatitis B",
+    Subtypes: null,
+    "Risk Factors": "unsafe injections, blood-borne exposure, mother-child transmission",
+    Symptoms: "jaundice, fatigue, abdominal pain, dark urine",
+    Prevention: "vaccination, safe medical practices, screening of blood donors"
+  },
+  {
+    Disease: "Hepatitis A",
+    Subtypes: null,
+    "Risk Factors": "contaminated food/water, poor sanitation",
+    Symptoms: "nausea, vomiting, fatigue, jaundice",
+    Prevention: "good sanitation, safe drinking water, vaccination"
+  },
+  {
+    Disease: "Measles",
+    Subtypes: null,
+    "Risk Factors": "unvaccinated status, close contact",
+    Symptoms: "fever, rash, cough, red eyes, Koplik's spots",
+    Prevention: "MMR vaccination, good hygiene, avoid contact with infected"
+  },
+  {
+    Disease: "Meningitis",
+    Subtypes: "Bacterial, Viral, Fungal",
+    "Risk Factors": "unvaccinated, close living conditions, weak immunity",
+    Symptoms: "fever, stiff neck, headache, nausea, confusion",
+    Prevention: "vaccination, prompt treatment, good sanitation"
+  },
+  {
+    Disease: "Stroke",
+    Subtypes: "Ischemic, Hemorrhagic",
+    "Risk Factors": "hypertension, high cholesterol, smoking, obesity, atrial fibrillation",
+    Symptoms: "sudden weakness, speech difficulty, vision changes, facial drooping",
+    Prevention: "control blood pressure, healthy diet, exercise, avoid tobacco"
+  },
+  {
+    Disease: "Migraine",
+    Subtypes: "With aura, Without aura",
+    "Risk Factors": "stress, hormonal changes, family history, certain foods",
+    Symptoms: "severe headache, sensitivity to light/sound, nausea",
+    Prevention: "identify triggers, medication, stress management, sufficient rest"
+  },
+  {
+    Disease: "Depression",
+    Subtypes: "Major depressive disorder, Persistent depressive disorder",
+    "Risk Factors": "genetics, chronic stress, trauma, lack of social support",
+    Symptoms: "persistent sadness, loss of interest, sleep disturbance, fatigue, changes in appetite",
+    Prevention: "therapy, social support, healthy lifestyle, stress reduction"
+  },
+  {
+    Disease: "Anxiety Disorders",
+    Subtypes: "Generalized, Panic Disorder, Social Anxiety",
+    "Risk Factors": "chronic stress, trauma, genetics, substance abuse",
+    Symptoms: "excessive worry, restlessness, sleep problems, panic attacks",
+    Prevention: "stress management, counseling, mindfulness, avoiding triggers"
+  },
+  {
+    Disease: "Obesity",
+    Subtypes: null,
+    "Risk Factors": "poor diet, sedentary lifestyle, genetics, overconsumption",
+    Symptoms: "weight gain, breathlessness, joint pain, fatigue",
+    Prevention: "balanced diet, regular exercise, portion control, behavior changes"
+  },
+  {
+    Disease: "Osteoarthritis",
+    Subtypes: null,
+    "Risk Factors": "age, joint injury, obesity, overuse",
+    Symptoms: "joint pain, stiffness, reduced mobility",
+    Prevention: "maintain healthy weight, exercise, joint protection, physical therapy"
+  },
+  {
+    Disease: "Rheumatoid Arthritis",
+    Subtypes: null,
+    "Risk Factors": "autoimmune predisposition, female sex, smoking",
+    Symptoms: "joint swelling, pain (especially morning), stiffness, fatigue",
+    Prevention: "medication, regular monitoring, physical therapy, avoid smoking"
+  },
+  {
+    Disease: "Osteoporosis",
+    Subtypes: null,
+    "Risk Factors": "age, low calcium/vitamin D, sedentary lifestyle, menopause",
+    Symptoms: "fractures, loss of height, back pain, kyphosis",
+    Prevention: "adequate calcium & Vitamin D, weight-bearing exercise, avoid smoking & alcohol"
+  },
+  {
+    Disease: "Parkinson’s Disease",
+    Subtypes: null,
+    "Risk Factors": "age, family history, pesticide exposure, low dopamine",
+    Symptoms: "tremor, rigidity, slowness of movement, balance issues",
+    Prevention: "no smoking, healthy diet, exercise, early diagnosis"
+  },
+  {
+    Disease: "Alzheimer’s Disease",
+    Subtypes: null,
+    "Risk Factors": "age, family history, cardiovascular disease, low education",
+    Symptoms: "memory loss, confusion, difficulty planning or solving problems",
+    Prevention: "mental stimulation, healthy diet, control cardiovascular risk factors"
+  },
+  {
+    Disease: "Chronic Kidney Disease",
+    Subtypes: null,
+    "Risk Factors": "diabetes, hypertension, obesity, infections, drug toxicity",
+    Symptoms: "fatigue, swelling in legs/ankles, trouble urinating, nausea",
+    Prevention: "control blood sugar & BP, healthy diet, avoid toxins, stay hydrated"
+  },
+  {
+    Disease: "Chronic Liver Disease / Cirrhosis",
+    Subtypes: null,
+    "Risk Factors": "alcohol abuse, hepatitis, obesity, fatty liver disease",
+    Symptoms: "jaundice, fatigue, abdominal swelling, loss of appetite",
+    Prevention: "limit alcohol, hepatitis vaccination, healthy diet, maintain weight"
+  },
+  {
+    Disease: "Fatty Liver Disease (NAFLD)",
+    Subtypes: null,
+    "Risk Factors": "obesity, insulin resistance, high fat diet, sedentary lifestyle",
+    Symptoms: "often silent, sometimes pain in upper right abdomen, fatigue",
+    Prevention: "weight loss, healthy diet, exercise, controlling blood sugar"
+  },
+  {
+    Disease: "Peptic Ulcer Disease",
+    Subtypes: "Gastric, Duodenal",
+    "Risk Factors": "H. pylori infection, NSAIDs, alcohol, smoking, stress",
+    Symptoms: "burning stomach pain, bloating, nausea, heartburn",
+    Prevention: "treat H. pylori, avoid long term NSAIDs, reduce alcohol & stress"
+  },
+  {
+    Disease: "Gastroenteritis",
+    Subtypes: "Viral, Bacterial, Parasitic",
+    "Risk Factors": "contaminated food/water, poor sanitation, weakened immunity",
+    Symptoms: "diarrhea, vomiting, abdominal pain, fever",
+    Prevention: "safe water & food, hand hygiene, good sanitation"
+  },
+  {
+    Disease: "Inflammatory Bowel Disease",
+    Subtypes: "Crohn’s, Ulcerative Colitis",
+    "Risk Factors": "genetics, immune dysregulation, smoking, diet",
+    Symptoms: "chronic diarrhea, abdominal pain, weight loss, bleeding",
+    Prevention: "regular medical care, healthy diet, avoid smoking, stress control"
+  },
+  {
+    Disease: "Anemia (Iron-deficiency, etc.)",
+    Subtypes: null,
+    "Risk Factors": "poor diet, blood loss, heavy menstruation, pregnancy",
+    Symptoms: "fatigue, pale skin, shortness of breath, dizziness",
+    Prevention: "iron-rich diet, iron supplements, treat underlying cause"
+  },
+  {
+    Disease: "Allergies",
+    Subtypes: "Food, Pollen, Dust, Drug",
+    "Risk Factors": "family history, exposure to allergens, asthma, environmental pollution",
+    Symptoms: "sneezing, itchy eyes, runny nose, rash, swelling",
+    Prevention: "avoid allergens, use antihistamines, clean environment"
+  },
+  {
+    Disease: "Eczema (Atopic Dermatitis)",
+    Subtypes: null,
+    "Risk Factors": "genetics, allergen exposure, dry skin, irritants, stress",
+    Symptoms: "itchy red skin, dryness, flaking, rash",
+    Prevention: "moisturizers, avoid irritants, stress management, skin hydration"
+  },
+  {
+    Disease: "Psoriasis",
+    Subtypes: null,
+    "Risk Factors": "immune dysregulation, genetics, stress, skin injury",
+    Symptoms: "red patches, silvery scales, itching, pain",
+    Prevention: "topical treatments, avoid triggers, proper skin care"
+  },
+  {
+    Disease: "Skin Cancer",
+    Subtypes: "Melanoma, Basal cell, Squamous cell",
+    "Risk Factors": "UV exposure, fair skin, tanning, family history",
+    Symptoms: "new or changing mole, skin lesion, bleeding, irregular border",
+    Prevention: "sunscreen, protective clothing, avoid tanning, regular skin checks"
+  },
+  {
+    Disease: "Stroke",
+    Subtypes: null,
+    "Risk Factors": "hypertension, atrial fibrillation, smoking, high cholesterol, obesity",
+    Symptoms: "sudden numbness, confusion, trouble speaking or walking, vision problems",
+    Prevention: "control BP, healthy diet, exercise, no smoking"
+  },
+  {
+    Disease: "Parkinson’s Disease",
+    Subtypes: null,
+    "Risk Factors": "age, genetics, pesticide exposure, head injury",
+    Symptoms: "tremors, rigidity, slow movement, balance issues",
+    Prevention: "exercise, healthy diet, avoid toxins, medical therapy"
+  },
+  {
+    Disease: "Epilepsy",
+    Subtypes: null,
+    "Risk Factors": "brain injury, genetics, infections, developmental disorders",
+    Symptoms: "seizures, loss of awareness, confusion",
+    Prevention: "safe environment, medical treatment, avoiding triggers"
+  },
+  {
+    Disease: "Multiple Sclerosis",
+    Subtypes: null,
+    "Risk Factors": "autoimmune predisposition, vitamin D deficiency, smoking",
+    Symptoms: "vision problems, numbness, muscle weakness, coordination issues",
+    Prevention: "medical therapy, avoid smoking, vitamin D, physical activity"
+  },
+  {
+    Disease: "Parkinson’s Disease",
+    Subtypes: null,
+    "Risk Factors": "age, genetics, pesticide exposure",
+    Symptoms: "tremor, rigidity, slow movements",
+    Prevention: "exercise, healthy diet, medical supervision"
+  },
+  {
+    Disease: "Polio",
+    Subtypes: null,
+    "Risk Factors": "unvaccinated status, fecal-oral route",
+    Symptoms: "fever, paralysis, muscle weakness",
+    Prevention: "vaccination, hygiene, clean water"
+  },
+  {
+    Disease: "Rabies",
+    Subtypes: null,
+    "Risk Factors": "animal bites, lack of post-exposure treatment",
+    Symptoms: "fever, pain at wound, neurological symptoms, fear of water",
+    Prevention: "animal vaccination, avoid stray animals, vaccine after exposure"
+  },
+  {
+    Disease: "Typhoid Fever",
+    Subtypes: null,
+    "Risk Factors": "contaminated food/water, poor sanitation",
+    Symptoms: "prolonged fever, stomach pain, headache, diarrhea",
+    Prevention: "safe water, proper sanitation, vaccination (if available)"
+  },
+  {
+    Disease: "Urinary Tract Infection",
+    Subtypes: "Cystitis, Pyelonephritis",
+    "Risk Factors": "female anatomy, sexual activity, catheter use, poor hygiene",
+    Symptoms: "painful urination, frequent urge, lower abdominal pain, cloudy urine",
+    Prevention: "hydration, urinate after sex, good hygiene, proper treatment"
+  },
+  {
+    Disease: "Kidney Stones",
+    Subtypes: null,
+    "Risk Factors": "dehydration, high salt diet, high protein diet, family history",
+    Symptoms: "severe pain in side/back, blood in urine, nausea, vomiting",
+    Prevention: "stay hydrated, limit salt & animal protein, maintain healthy weight"
+  },
+  {
+    Disease: "Gallstones",
+    Subtypes: null,
+    "Risk Factors": "obesity, high fat diet, female sex, age, rapid weight loss",
+    Symptoms: "upper right abdominal pain, nausea, sometimes jaundice",
+    Prevention: "healthy diet, maintain weight, avoid rapid weight loss"
+  },
+  {
+    Disease: "Pancreatitis",
+    Subtypes: "Acute, Chronic",
+    "Risk Factors": "alcohol abuse, gallstones, high triglycerides, smoking",
+    Symptoms: "severe abdominal pain, nausea, vomiting, fever",
+    Prevention: "limit alcohol, treat gallstones, healthy lipid levels"
+  },
+  {
+    Disease: "Alzheimer’s Disease",
+    Subtypes: null,
+    "Risk Factors": "age, family history, cardiovascular risk factors, low cognitive activity",
+    Symptoms: "memory loss, confusion, difficulty thinking or planning",
+    Prevention: "mental stimulation, healthy diet, control cardiovascular factors"
+  },
+  {
+    Disease: "Dementia (other than Alzheimer’s)",
+    Subtypes: null,
+    "Risk Factors": "age, brain injury, hearing loss, poor heart health, social isolation",
+    Symptoms: "loss of memory, confusion, impaired reasoning, mood changes",
+    Prevention: "healthy cardiovascular profile, cognitive activity, social interaction, hearing care"
+  },
+  {
+    Disease: "Depression",
+    Subtypes: null,
+    "Risk Factors": "genetics, stress, trauma, chronic disease",
+    Symptoms: "persistent sadness, loss of interest, sleep or appetite changes, fatigue",
+    Prevention: "therapy, lifestyle changes, social support, stress management"
+  },
+  {
+    Disease: "Schizophrenia",
+    Subtypes: null,
+    "Risk Factors": "genetics, substance abuse, prenatal environment",
+    Symptoms: "hallucinations, delusions, social withdrawal, disorganized thinking",
+    Prevention: "early intervention, therapeutic support, medication, reduce substance use"
+  },
+  {
+    Disease: "Anemia (Iron deficiency etc.)",
+    Subtypes: null,
+    "Risk Factors": "poor diet, blood loss, menstruation, pregnancy",
+    Symptoms: "fatigue, pale skin, shortness of breath, dizziness",
+    Prevention: "iron-rich foods, supplements, treat underlying cause"
+  },
+  {
+    Disease: "Obesity",
+    Subtypes: null,
+    "Risk Factors": "overconsumption, sedentary lifestyle, poor diet, genetic predisposition",
+    Symptoms: "excess weight, breathlessness, joint pain, fatigue",
+    Prevention: "balanced diet, exercise, portion control"
+  },
+  {
+    Disease: "Osteoporosis",
+    Subtypes: null,
+    "Risk Factors": "age, low calcium, vitamin D deficiency, sedentary lifestyle",
+    Symptoms: "bone fractures, loss of height, back pain",
+    Prevention: "adequate calcium & vitamin D, weight-bearing exercise, avoid smoking"
+  },
+  {
+    Disease: "Skin Cancer",
+    Subtypes: "Melanoma, Basal cell, Squamous cell",
+    "Risk Factors": "UV exposure, fair skin, tanning beds, family history",
+    Symptoms: "new/changing moles, skin lesion changes, bleeding, asymmetry",
+    Prevention: "sunscreen, avoid tanning, regular skin check"
+  },
+  {
+    Disease: "Psoriasis",
+    Subtypes: null,
+    "Risk Factors": "immune dysregulation, stress, genetic factors",
+    Symptoms: "red rough patches, scaly skin, itchiness",
+    Prevention: "topical therapy, avoid triggers, moisture, stress management"
+  },
+  {
+    Disease: "Gout",
+    Subtypes: null,
+    "Risk Factors": "high purine diet, alcohol, obesity, kidney issues",
+    Symptoms: "sudden joint pain (often big toe), swelling, redness",
+    Prevention: "diet changes, limit alcohol, hydration, manage weight"
+  },
+  {
+    Disease: "Gallbladder Disease (Gallstones)",
+    Subtypes: null,
+    "Risk Factors": "obesity, high fat diet, female sex, age, rapid weight loss",
+    Symptoms: "abdominal pain especially after fatty meals, nausea",
+    Prevention: "healthy diet, maintain weight, avoid rapid weight loss"
+  },
+  {
+    Disease: "Pancreatic Cancer",
+    Subtypes: null,
+    "Risk Factors": "smoking, chronic pancreatitis, family history",
+    Symptoms: "abdominal/back pain, unexplained weight loss, jaundice",
+    Prevention: "avoid tobacco, healthy diet, early detection (though hard)"
+  },
+  {
+    Disease: "Kidney Stones",
+    Subtypes: null,
+    "Risk Factors": "dehydration, high salt & protein diet, family history",
+    Symptoms: "severe flank or back pain, blood in urine, nausea, vomiting",
+    Prevention: "stay hydrated, reduce salt, balanced diet"
+  },
+  {
+    Disease: "Urinary Tract Infection (UTI)",
+    Subtypes: "Cystitis, Pyelonephritis",
+    "Risk Factors": "female anatomy, sexual activity, catheter use, poor hygiene",
+    Symptoms: "burning urination, frequent urge, lower abdominal pain, cloudy urine",
+    Prevention: "hydration, urinate after sex, hygiene, proper medical treatment"
+  },
+  {
+    Disease: "Gallstones",
+    Subtypes: null,
+    "Risk Factors": "high fat diet, obesity, female gender, age",
+    Symptoms: "upper right abdominal pain, sometimes nausea, sometimes jaundice",
+    Prevention: "healthy diet, weight control"
+  },
+  {
+    Disease: "Pancreatitis",
+    Subtypes: "Acute, Chronic",
+    "Risk Factors": "alcohol, gallstones, high triglycerides, smoking",
+    Symptoms: "severe abdominal pain, nausea, vomiting, fever",
+    Prevention: "limit alcohol, treat underlying issues, maintain lipid levels"
+  },
+  {
+    Disease: "Typhoid Fever",
+    Subtypes: null,
+    "Risk Factors": "contaminated food/water, poor sanitation",
+    Symptoms: "prolonged fever, stomach pain, headache, sometimes rash",
+    Prevention: "safe water, sanitation, vaccination"
+  },
+  {
+    Disease: "Whooping Cough (Pertussis)",
+    Subtypes: null,
+    "Risk Factors": "unvaccinated, close contact with infected, age extremes",
+    Symptoms: "severe cough, whooping sound, vomiting after cough, exhaustion",
+    Prevention: "vaccination, boosters, avoid exposure"
+  }
+];
+
+// --- load saved progress if any
+window.addEventListener('load',()=>{
+  loadFromStorage();
+  showStep(1);
+  // keyboard navigation for option divs
+  document.querySelectorAll('.option[role="radio"]').forEach(o=>{
+    o.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' || e.key===' ') { e.preventDefault(); const input = o.querySelector('input'); if(input){ input.checked = true; o.setAttribute('aria-pressed','true'); } }
+    });
+  });
+});
+
+/* ---------- navigation ---------- */
+function showStep(n){
+  // n is number or 'results'
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  if(n === 'results' || n === totalSteps){
+    document.getElementById('results').classList.add('active');
+    currentStep = totalSteps;
+  } else {
+    const el = document.getElementById('step' + n) || document.getElementById('step' + n);
+    if(!el && n !== 1) { console.warn('no element for step',n); }
+    const my = document.getElementById(n===1 ? 'step1' : ('step'+n));
+    if(my) my.classList.add('active'); else console.warn('step element missing',n);
+    currentStep = n;
+  }
+  updateProgress();
+  // focus management: focus first input in active step
+  const active = document.querySelector('.step.active');
+  if(active){
+    const focusable = active.querySelector('input, button, select, [tabindex]');
+    if(focusable) focusable.focus();
+  }
+}
+
+// progress percent approx
+function updateProgress(){
+  const pct = Math.round(((currentStep-1)/(totalSteps-1))*100);
+  progressBar.style.width = pct + '%';
+  progressInfo.textContent = `Step ${currentStep} / ${totalSteps} — ${pct}%`;
+  saveToStorage(); // autosave on each update
+}
+
+function next(){
+  if(!validateStep(currentStep)) return;
+  // special case: from step17 -> review (step18)
+  const nextStep = Math.min(totalSteps-1, currentStep + 1);
+  // if stepping from 17 to 18, we must generate review
+  if(currentStep === 17) {
+    renderReview();
+    showStep(18);
+    return;
+  }
+  showStep(nextStep);
+}
+
+function prev(){
+  const prevStep = Math.max(1, currentStep - 1);
+  showStep(prevStep);
+}
+
+/* ---------- validation (inline) ---------- */
+function validateStep(n){
+  clearError(n);
+  if(n===1){
+    const v = document.querySelector('input[name="sex"]:checked');
+    if(!v){ showError(n, 'Please select sex at birth.'); return false; }
+  }
+  if(n===3){
+    const age = Number(document.getElementById('ageInput').value || 0);
+    if(age <= 0 || age > 120){ showError(n, 'Please enter a valid age between 1 and 120.'); return false; }
+  }
+  if(n===5){
+    const h = Number(document.getElementById('heightInput').value || 0);
+    const w = Number(document.getElementById('weightInput').value || 0);
+    if(h && (h<50 || h>250)){ showError(n, 'Please enter a realistic height in cm (50–250).'); return false; }
+    if(w && (w<20 || w>400)){ showError(n, 'Please enter a realistic weight in kg (20–400).'); return false; }
+  }
+  return true;
+}
+function showError(step, msg){
+  const el = document.getElementById('err-step' + step);
+  if(el){ el.style.display='block'; el.textContent = msg; }
+}
+function clearError(step){
+  const el = document.getElementById('err-step' + step);
+  if(el){ el.style.display='none'; el.textContent = ''; }
+}
+
+/* ---------- chips (meds & symptoms) ---------- */
+const medInput = document.getElementById('medInput');
+if(medInput){
+  medInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      const v = medInput.value.trim();
+      if(v){ addMed(v); medInput.value=''; }
+    }
+  });
+}
+function addMed(v){
+  if(!v) return;
+  if(!meds.includes(v)) meds.push(v);
+  renderChips('medChips', meds);
+  saveToStorage();
+}
+function renderChips(containerId, arr){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML = '';
+  arr.forEach(item=>{
+    const el = document.createElement('span');
+    el.className = 'chip';
+    el.innerHTML = `<span>${escapeHtml(item)}</span><button aria-label="remove ${escapeHtml(item)}">✕</button>`;
+    el.querySelector('button').addEventListener('click', ()=>{ removeChip(containerId, item); });
+    container.appendChild(el);
+  });
+}
+function removeChip(containerId, value){
+  if(containerId==='medChips'){ meds = meds.filter(m=>m!==value); renderChips('medChips', meds); saveToStorage(); }
+  if(containerId==='symptomChips'){ symptoms = symptoms.filter(s=>s!==value); renderChips('symptomChips', symptoms); saveToStorage(); }
+}
+
+const symptomInput = document.getElementById('symptomInput');
+if(symptomInput){
+  symptomInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ','){
+      e.preventDefault();
+      const v = symptomInput.value.trim().replace(/,+$/,'');
+      if(v){ addSymptom(v); symptomInput.value=''; }
+    }
+  });
+}
+function addSymptom(v){
+  if(!v) return;
+  const parts = v.split(',').map(s=>s.trim()).filter(Boolean);
+  for(const p of parts) if(!symptoms.includes(p)) symptoms.push(p);
+  renderChips('symptomChips', symptoms);
+  saveToStorage();
+}
+
+/* clicking option toggles underlying input for UX */
+document.addEventListener('click', function(e){
+  const opt = e.target.closest('.option');
+  if(opt){
+    const input = opt.querySelector('input');
+    if(!input) return;
+    if(input.type==='checkbox') input.checked = !input.checked;
+    else if(input.type==='radio') input.checked = true;
+    // reflect aria-pressed for choices
+    if(opt.getAttribute('role')==='radio') {
+      opt.setAttribute('aria-pressed','true');
+      // clear siblings
+      opt.parentElement.querySelectorAll('.option[role="radio"]').forEach(s=>{ if(s!==opt) s.setAttribute('aria-pressed','false'); });
+    }
+    saveToStorage();
+  }
+});
+
+/* ---------- finish & scoring ---------- */
+function finish(){
+  if(!validateStep(currentStep)) return;
+  // collect profile
+  const profile = collectProfile();
+  // scoring
+  const results = DISEASES.map(d=>{
+    const dSymptoms = (d.Symptoms||'').toLowerCase();
+    const dRisks = (d["Risk Factors"]||'').toLowerCase();
+    let score = 0;
+    const matchedSymptoms = [];
+    const matchedRisks = [];
+
+    for(const s of profile.symptoms){
+      const key = s.toLowerCase();
+      if(!key) continue;
+      if(dSymptoms.includes(key)){ score += 3; matchedSymptoms.push(s); }
+      else {
+        const tokens = key.split(/\s+/);
+        for(const t of tokens){
+          if(t.length>2 && dSymptoms.includes(t)){ score += 1; matchedSymptoms.push(s); break; }
+        }
+      }
+    }
+
+    for(const r of profile.riskFactors.concat(profile.familyHistory, profile.medsList)){
+      const key = (r||'').toLowerCase();
+      if(!key) continue;
+      if(dRisks.includes(key) || dSymptoms.includes(key)){ score += 1; matchedRisks.push(r); }
+    }
+
+    if(profile.bmi && profile.bmi >= 30 && /diabetes|cardiovascular|heart|stroke|obesity/i.test(d.Disease)) score += 1;
+    if(profile.age >= 65 && /pneumonia|influenza|covid|cardiovascular|stroke/i.test(d.Disease)) score += 1;
+    if(profile.sex === 'Female' && /breast|ovary|uterine/i.test(d.Disease)) score += 1;
+    if(profile.smoke === 'Current' && /chronic respiratory|pneumonia|lung|cancer/i.test(d.Disease)) score += 1;
+
+    return { disease: d.Disease, subtypes: d.Subtypes, prevention: d.Prevention, score, matchedSymptoms, matchedRisks, raw:d };
+  });
+
+  results.sort((a,b)=>b.score - a.score);
+  const filtered = results.filter(r=>r.score>0);
+  renderResults(filtered);
+  // store last report
+  window._lastReport = { profile, results: filtered.map(r=>({disease:r.disease,score:r.score,matchedSymptoms:r.matchedSymptoms,matchedRisks:r.matchedRisks,prevention:r.prevention})) };
+  showStep('results');
+}
+
+/* ---------- render results ---------- */
+function renderResults(filtered){
+  const resultsGrid = document.getElementById('resultsGrid');
+  resultsGrid.innerHTML = '';
+  if(!filtered || filtered.length===0){
+    resultsGrid.innerHTML = `<div class="result-card"><strong>No likely matches found</strong><p class="small-muted">Try adding more or clearer symptoms.</p></div>`;
+    return;
+  }
+  filtered.slice(0,8).forEach(r=>{
+    resultsGrid.appendChild(makeResultCard(r.disease, r.subtypes, r.matchedSymptoms, r.matchedRisks, r.prevention, r.score));
+  });
+}
+function makeResultCard(name, subtypes, matchedSymptoms, matchedRisks, prevention, score){
+  const el = document.createElement('div');
+  el.className = 'result-card';
+  // confidence label heuristics
+  const conf = score >= 6 ? 'High' : (score >= 3 ? 'Medium' : 'Low');
+  const confClass = score >= 6 ? 'confidence-high' : (score >= 3 ? 'confidence-mid' : 'confidence-low');
+  el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><strong style="font-size:16px">${escapeHtml(name)}</strong><div class="small-muted">${escapeHtml(subtypes||'')}</div></div>
+      <div style="text-align:right"><div class="result-score ${confClass}">${escapeHtml(conf)}</div><div class="small-muted">confidence</div></div>
+    </div>
+    <div style="margin-top:10px">${matchedSymptoms.length?'<div><strong>Matched symptoms:</strong> '+escapeHtml(matchedSymptoms.join(', '))+'</div>':''}
+    ${matchedRisks.length?'<div style="margin-top:6px"><strong>Matched risk/conditions:</strong> '+escapeHtml(matchedRisks.join(', '))+'</div>':''}
+    <div style="margin-top:10px"><strong>Prevention:</strong><div class="small-muted" style="margin-top:6px">${escapeHtml(prevention)}</div></div>`;
+  return el;
+}
+
+/* ---------- review rendering ---------- */
+function renderReview(){
+  const container = document.getElementById('reviewContainer');
+  const profile = collectProfile();
+  container.innerHTML = '';
+  const rows = [];
+  rows.push({label:'Sex at birth', value:profile.sex, step:1});
+  rows.push({label:'Gender', value:profile.gender, step:2});
+  rows.push({label:'Age', value:profile.age, step:3});
+  rows.push({label:'Ethnicity', value:profile.ethnicity.join(', '), step:4});
+  rows.push({label:'Height / Weight / BMI', value:(profile.height?profile.height+'cm ':'') + (profile.weight?profile.weight+'kg ':'') + (profile.bmi?(' — BMI '+profile.bmi):''), step:5});
+  rows.push({label:'Family history', value:profile.familyHistory.join(', '), step:6});
+  rows.push({label:'Alcohol', value:profile.alcohol, step:7});
+  rows.push({label:'Smoking', value:profile.smoke, step:8});
+  rows.push({label:'Activity', value:profile.activity, step:9});
+  rows.push({label:'Diet', value:profile.diet, step:10});
+  rows.push({label:'Sleep', value:profile.sleep, step:11});
+  rows.push({label:'Mental health', value:profile.mental.join(', '), step:12});
+  rows.push({label:'Travel/exposure', value:(profile.travel==='Yes'? (profile.travelDetail || 'Yes') : profile.travel), step:13});
+  rows.push({label:'Vaccinations', value:profile.vaccines.join(', '), step:14});
+  rows.push({label:'Medications', value:profile.medsList.join(', '), step:15});
+  rows.push({label:'Symptoms', value:profile.symptoms.join(', '), step:16});
+  rows.push({label:'Risk factors', value:profile.riskFactors.join(', '), step:17});
+
+  rows.forEach(r=>{
+    const div = document.createElement('div');
+    div.className = 'review-row';
+    div.innerHTML = `<div style="min-width:0"><strong>${escapeHtml(r.label)}</strong><div class="small-muted" style="margin-top:6px">${escapeHtml(r.value||'—')}</div></div>
+      <div><button class="btn ghost small" onclick="showStep(${r.step})">Edit</button></div>`;
+    container.appendChild(div);
+  });
+}
+
+/* ---------- collect profile ---------- */
+function collectProfile(){
+  const sex = (document.querySelector('input[name="sex"]:checked')||{}).value || '';
+  const gender = (document.querySelector('input[name="gender"]:checked')||{}).value || '';
+  const age = Number(document.getElementById('ageInput').value || 0);
+  const ethnicity = Array.from(document.querySelectorAll('#ethnicityOptions input:checked')).map(i=>i.value);
+  const height = Number(document.getElementById('heightInput').value || 0);
+  const weight = Number(document.getElementById('weightInput').value || 0);
+  const bmi = (height && weight) ? +(weight/((height/100)*(height/100))).toFixed(1) : null;
+  const familyHistory = Array.from(document.querySelectorAll('#step6 input:checked')).map(i=>i.value);
+  const alcohol = (document.querySelector('input[name="alcohol"]:checked')||{}).value || '';
+  const smoke = (document.querySelector('input[name="smoke"]:checked')||{}).value || '';
+  const activity = (document.querySelector('input[name="activity"]:checked')||{}).value || '';
+  const diet = (document.querySelector('input[name="diet"]:checked')||{}).value || '';
+  const sleep = (document.querySelector('input[name="sleep"]:checked')||{}).value || '';
+  const mental = Array.from(document.querySelectorAll('#step12 input:checked')).map(i=>i.value);
+  const travel = (document.querySelector('input[name="travel"]:checked')||{}).value || '';
+  const travelDetail = document.getElementById('travelDetail').value || '';
+  const vaccines = Array.from(document.querySelectorAll('#step14 input:checked')).map(i=>i.value);
+  const medsList = meds.slice();
+  const riskFactors = Array.from(document.querySelectorAll('#step17 input:checked')).map(i=>i.value);
+
+  return { sex, gender, age, ethnicity, height, weight, bmi, familyHistory, alcohol, smoke, activity, diet, sleep, mental, travel, travelDetail, vaccines, medsList, symptoms: symptoms.slice(), riskFactors };
+}
+
+/* ---------- restart and report ---------- */
+function restart(){
+  document.querySelectorAll('input').forEach(i=>{ if(i.type==='radio'||i.type==='checkbox') i.checked=false; });
+  document.querySelectorAll('input[type="text"]').forEach(i=>i.value='');
+  document.querySelectorAll('input[type="number"]').forEach(i=>{ if(i.id!=='ageInput') i.value=''; });
+  document.getElementById('ageInput').value = 30;
+  meds = []; symptoms = [];
+  renderChips('medChips', meds); renderChips('symptomChips', symptoms);
+  saveToStorage(true); // clear
+  showStep(1);
+}
+
+function downloadReport(){
+  const data = window._lastReport || { message:'no data' };
+  const blob = new Blob([JSON.stringify(data,null,2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'symptom-report.json'; a.click(); URL.revokeObjectURL(url);
+}
+
+function printReport(){
+  window.print();
+}
+
+/* ---------- storage (autosave / resume) ---------- */
+function saveToStorage(clear=false){
+  try{
+    if(clear){ localStorage.removeItem(STORAGE_KEY); document.getElementById('saveNotice').textContent='No saved progress.'; return; }
+    const state = {
+      meds, symptoms,
+      // inputs
+      sex: (document.querySelector('input[name="sex"]:checked')||{}).value || '',
+      gender: (document.querySelector('input[name="gender"]:checked')||{}).value || '',
+      age: document.getElementById('ageInput').value || '',
+      ethnicity: Array.from(document.querySelectorAll('#ethnicityOptions input:checked')).map(i=>i.value),
+      height: document.getElementById('heightInput').value || '',
+      weight: document.getElementById('weightInput').value || '',
+      familyHistory: Array.from(document.querySelectorAll('#step6 input:checked')).map(i=>i.value),
+      alcohol: (document.querySelector('input[name="alcohol"]:checked')||{}).value || '',
+      smoke: (document.querySelector('input[name="smoke"]:checked')||{}).value || '',
+      activity: (document.querySelector('input[name="activity"]:checked')||{}).value || '',
+      diet: (document.querySelector('input[name="diet"]:checked')||{}).value || '',
+      sleep: (document.querySelector('input[name="sleep"]:checked')||{}).value || '',
+      mental: Array.from(document.querySelectorAll('#step12 input:checked')).map(i=>i.value),
+      travel: (document.querySelector('input[name="travel"]:checked')||{}).value || '',
+      travelDetail: document.getElementById('travelDetail').value || '',
+      vaccines: Array.from(document.querySelectorAll('#step14 input:checked')).map(i=>i.value),
+      riskFactors: Array.from(document.querySelectorAll('#step17 input:checked')).map(i=>i.value),
+      timestamp: Date.now()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    document.getElementById('saveNotice').textContent = 'Progress autosaved (local only).';
+  }catch(e){
+    console.warn('storage error',e);
+  }
+}
+
+function loadFromStorage(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) { document.getElementById('saveNotice').textContent = 'No saved progress.'; return; }
+    const state = JSON.parse(raw);
+    if(!state) return;
+    // ask user to resume
+    if(confirm('We found a saved session. Do you want to restore your previous answers?')) {
+      // restore fields tolerantly
+      if(state.sex) document.querySelector(`input[name="sex"][value="${state.sex}"]`)?.click();
+      if(state.gender) document.querySelector(`input[name="gender"][value="${state.gender}"]`)?.click();
+      if(state.age) document.getElementById('ageInput').value = state.age;
+      if(Array.isArray(state.ethnicity)) state.ethnicity.forEach(v=>{ const el = Array.from(document.querySelectorAll('#ethnicityOptions input')).find(i=>i.value===v); if(el) el.checked = true; });
+      if(state.height) document.getElementById('heightInput').value = state.height;
+      if(state.weight) document.getElementById('weightInput').value = state.weight;
+      if(Array.isArray(state.familyHistory)) state.familyHistory.forEach(v=>{ const sel = Array.from(document.querySelectorAll('#step6 input')).find(i=>i.value===v); if(sel) sel.checked=true; });
+      if(state.alcohol) document.querySelector(`input[name="alcohol"][value="${state.alcohol}"]`)?.click();
+      if(state.smoke) document.querySelector(`input[name="smoke"][value="${state.smoke}"]`)?.click();
+      if(state.activity) document.querySelector(`input[name="activity"][value="${state.activity}"]`)?.click();
+      if(state.diet) document.querySelector(`input[name="diet"][value="${state.diet}"]`)?.click();
+      if(state.sleep) document.querySelector(`input[name="sleep"][value="${state.sleep}"]`)?.click();
+      if(Array.isArray(state.mental)) state.mental.forEach(v=>{ const el = Array.from(document.querySelectorAll('#step12 input')).find(i=>i.value===v); if(el) el.checked=true; });
+      if(state.travel) document.querySelector(`input[name="travel"][value="${state.travel}"]`)?.click();
+      if(state.travelDetail) document.getElementById('travelDetail').value = state.travelDetail;
+      if(Array.isArray(state.vaccines)) state.vaccines.forEach(v=>{ const el = Array.from(document.querySelectorAll('#step14 input')).find(i=>i.value===v); if(el) el.checked=true; });
+      if(Array.isArray(state.riskFactors)) state.riskFactors.forEach(v=>{ const el = Array.from(document.querySelectorAll('#step17 input')).find(i=>i.value===v); if(el) el.checked=true; });
+      meds = Array.isArray(state.meds) ? state.meds : [];
+      symptoms = Array.isArray(state.symptoms) ? state.symptoms : [];
+      renderChips('medChips', meds);
+      renderChips('symptomChips', symptoms);
+      document.getElementById('saveNotice').textContent = 'Restored saved session.';
+    } else {
+      document.getElementById('saveNotice').textContent = 'Saved session found (not restored).';
+    }
+  }catch(e){
+    console.warn('load error',e);
+  }
+}
+
+/* ---------- small helpers ---------- */
+function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function goHome(){ window.scrollTo({top:0,behavior:'smooth'}); showStep(1); }
+function goContact(){ document.getElementById("contactSection").scrollIntoView({ behavior: "smooth" }); }
+
+/* expose some for debugging */
+window._app = { addMed, addSymptom, finish, restart, downloadReport, collectProfile, saveToStorage };
+
+ function handleLogin(event) {
+  event.preventDefault();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  // Simple login check (you can customize)
+  if (username === "1" && password === "1") {
+    // hide login
+    document.getElementById("loginSection").style.display = "none";
+    // show main site
+    document.querySelector(".site").style.display = "block";
+  } else {
+    alert("Invalid username or password!");
+  }
+}
+
+// Simulated Google login
+document.getElementById("googleSignupBtn").addEventListener("click", () => {
+  alert("Google Sign-In simulated ✅");
+  document.getElementById("loginSection").style.display = "none";
+  document.getElementById("dashboardSection").style.display = "flex";
+});
+
+// Logout function
+function logout() {
+  document.getElementById("dashboardSection").style.display = "none";
+  document.getElementById("loginSection").style.display = "flex";
+  document.getElementById("loginForm").reset();
+}
+
+
+
+function logout() {
+    // clear stored user data
+    localStorage.removeItem("username");
+
+    // hide the main app
+    document.querySelector('.site').style.display = 'none';
+
+    // show login screen again
+    document.getElementById('loginSection').style.display = 'flex';
+  }
+
+function handleCredentialResponse(response) {
+  console.log("Google login token:", response.credential);
+  // Hide login page, show your main project
+  document.getElementById("loginSection").style.display = "none";
+  document.querySelector(".site").style.display = "block";
+}
+</script>
+
+<!-- Put your DISEASES array below (full copy from your original file). For brevity in this snippet I omitted the long JSON, but you should include the same DISEASES variable you had previously (unchanged). -->
+
+</body>
+</html>
