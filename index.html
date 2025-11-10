@@ -249,7 +249,7 @@
       <div id="step2" class="step" data-step="2">
         <h3>2 / 19 — Gender identity</h3>
         <div class="options" role="radiogroup" aria-label="Gender identity">
-          <label class="option"><input type="radio" name="gender" value="Cisgender"> Cisgender</label>
+          
           <label class="option"><input type="radio" name="gender" value="Transgender"> Transgender</label>
           <label class="option"><input type="radio" name="gender" value="Non-binary"> Non-binary</label>
           <label class="option"><input type="radio" name="gender" value="Prefer not to say"> Prefer not to say</label>
@@ -455,7 +455,7 @@
       </ul>
     </div>
 
-    <footer class="small">This tool is for informational purposes only. It is NOT a medical diagnosis.</footer>
+    <footer class="small">&copy; 2025 AI HEALTH DETECTION — All rights reserved.</footer>
   </div>
 
 <!-- tsparticles CDN (single load) -->
@@ -1355,11 +1355,22 @@ window._app = { addMed, addSymptom, finish, restart, downloadReport, collectProf
 
  function handleLogin(event) {
   event.preventDefault();
+
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  // Simple login check (you can customize)
-  if (username === "1" && password === "1") {
+  // ✅ Add as many users as you want here
+  const users = [
+    { username: "1", password: "1" },
+    { username: "ambarish", password: "69" },
+    { username: "tamaghna", password: "1" },
+    { username: "xnxx", password: "69" }
+  ];
+
+  // check if any user matches input
+  const validUser = users.find(u => u.username === username && u.password === password);
+
+  if (validUser) {
     // hide login
     document.getElementById("loginSection").style.display = "none";
     // show main site
@@ -1408,4 +1419,5 @@ function handleCredentialResponse(response) {
 
 </body>
 </html>
+
 
